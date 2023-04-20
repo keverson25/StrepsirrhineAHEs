@@ -25,3 +25,6 @@ The input file used in TACT to help place missing taxa
 
 ### TipDR_Calculation.R
 The R script used to estimate the tip-DR statistic
+
+### GeneTreeAlignments
+A folder containing DNA alignments (in fasta format) for all nuclear data analyzed in this study.
