@@ -5,9 +5,6 @@ The following files are associated with Everson et al. 2023 "Not one, but multip
 ### CLaDs.R
 The R script used to run the CLaDs diversification analysis.
 
-### Lemuridae_mtCDS_cat.nex
-A nexus file containing the mitochondrial data analyzed in IQTree
-
 ### MiSSE_HiSSE_v2.R
 The R script used to run the MiSSE and HiSSE diversification analyses.
 
@@ -19,6 +16,9 @@ The final result from TACT containing 1000 phylogenetic trees where missing spec
 
 ### Strepsirrhini_MCMCTree_input.tre
 The input file for MCMCTree containing the phylogeny estimated in IQTree as well as the calibrated nodes.
+
+### Strepsirrhini_mtCDS_cat.nex
+A nexus file containing the mitochondrial data analyzed in IQTree
 
 ### TACT_Strepsirrhini.csv
 The input file used in TACT to help place missing taxa
