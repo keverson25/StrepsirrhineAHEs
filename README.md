@@ -2,11 +2,11 @@
 
 The following files are associated with Everson et al. 2023 "Not one, but multiple radiations underlie the biodiversity of Madagascar's endangered lemurs"
 
-### CLaDs.R
-The R script used to run the CLaDs diversification analysis.
-
 ### MiSSE_HiSSE_v2.R
 The R script used to run the MiSSE and HiSSE diversification analyses.
+
+### PybusGamma_TaxInflation.R
+The R script used to calculate Pybus & Harvey's Gamma values under scenarios of taxonomic inflation (lemurs) or a taxonomic gap (lorisiforms).
 
 ### Strepsirrhine_TimeTree.tre
 The final result from MCMCTree showing estimated divergence times for strepsirrhines
