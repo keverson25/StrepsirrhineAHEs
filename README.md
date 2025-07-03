@@ -2,6 +2,9 @@
 
 The following files are associated with Everson et al. 2025 "Multiple bursts of speciation in Madagascar’s endangered lemurs"
 
+### MCMCtreeR_CauchyScaleEstimation.R
+The R script used to estimate the scale parameter of the Cauchy distributions for MCMCtree fossil calibrations.
+
 ### MiSSE_HiSSE.R
 The R script used to run the MiSSE and HiSSE diversification analyses.
 
