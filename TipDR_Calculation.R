@@ -1,34 +1,24 @@
 library(phytools)
 library(ape)
+library(ggplot2)
+library(ggridges)
+library(epm)
 
-setwd("~/Documents/PostdocStuff/Strepsirrhine_AHE_Manuscript/Analyses/TACT/")
-StrepsirrhineTrees<-read.tree("Strepsirrhini.tacted.AllTrees.newick.tre")
+StrepsirrhineTrees<-read.tree("6000TactTrees.trees")
 
-# DR metric / inverse equal splits
-DRstat <- function(tree) {
-	
-	spRate <- function(sp, tree) {
-		#get branch lengths from root to tip
-		edges <- vector()
-		daughterNode <- match(sp, tree$tip.label)
-		while (daughterNode != (length(tree$tip.label) + 1)) {
-			parentNode <- tree$edge[which(tree$edge[,2] == daughterNode), 1]
-			edges <- c(edges, tree$edge.length[which(tree$edge[,1] == parentNode & tree$edge[,2] == daughterNode)])
-			daughterNode <- parentNode
-		}
-		
-		res <- sum(sapply(1:length(edges), function(x) edges[x] * (1/(2 ^ (x-1)))))
-		res <- res ^ (-1)
-		
-		return(res)
-	}
-	
-	rates <- unlist(lapply(tree$tip.label, function(x) spRate(x, tree)))
-	names(rates) <- tree$tip.label
-	
-	return(rates)
+for(i in 1:length(StrepsirrhineTrees)){
+  print(max(nodeHeights(StrepsirrhineTrees[[i]])))
 }
 
+#fix scaling of edge lengths
+for(i in 1:length(StrepsirrhineTrees)){
+  StrepsirrhineTrees[[i]]$edge.length<-(StrepsirrhineTrees[[i]]$edge.length)*100
+}
+plot(StrepsirrhineTrees[[1]])
+
+# Create lists of taxa for lemurs and lorisiforms for later analyses
+Lorisiforms<-c("X.Arctocebus.aureus.","X.Arctocebus.calabarensis.","X.Perodicticus.potto.","X.Perodicticus.ibeanus.","X.Perodicticus.edwardsi.","X.Loris.lydekkerianus.","X.Loris.tardigradus.","X.Nycticebus.bengaliensis.","X.Nycticebus.bancanus.","X.Nycticebus.borneanus.","X.Nycticebus.javanicus.","X.Nycticebus.menagensis.","X.Nycticebus.pygmaeus.","X.Nycticebus.coucang.","X.Nycticebus.hilleri.","X.Nycticebus.kayan.","X.Euoticus.pallidus.","X.Euoticus.elegantulus.","X.Galagoides.thomasi.","X.Galagoides.kumbirensis.","Galagoides_demidoff","X.Otolemur.monteiri.","X.Otolemur.crassicaudatus.","X.Otolemur.garnettii.","X.Sciurocheirus.gabonensis.","X.Sciurocheirus.cameronensis.","X.Sciurocheirus.makandensis.","X.Sciurocheirus.alleni.","Galago_moholi","X.Galago.senegalensis.","Galago_gallarum","X.Galago.matschiei.","X.Paragalago.nyasae.","X.Paragalago.orinus.","X.Paragalago.granti.","Paragalago_cocos","X.Paragalago.rondoensis.","X.Paragalago.zanzibaricus.")
+Lemuriforms<-c("X.Daubentonia.madagascariensis.","Varecia_rubra","X.Varecia.variegata.","X.Lemur.catta.","Prolemur_simus","X.Hapalemur.gilberti.","Hapalemur_griseus","X.Hapalemur.meridionalis.","Hapalemur_aureus","X.Hapalemur.alaotrensis.","X.Hapalemur.occidentalis.","X.Eulemur.mongoz.","X.Eulemur.rubriventer.","X.Eulemur.coronatus.","X.Eulemur.flavifrons.","Eulemur_macaco","X.Eulemur.albifrons.","X.Eulemur.sanfordi.","X.Eulemur.rufifrons.","Eulemur_fulvus","Eulemur_rufus","Eulemur_collaris","X.Eulemur.cinereiceps.","X.Indri.indri.","X.Propithecus.edwardsi.","X.Propithecus.diadema.","X.Propithecus.perrieri.","X.Propithecus.coquereli.","X.Propithecus.candidus.","X.Propithecus.tattersalli.","X.Propithecus.deckenii.","X.Propithecus.verreauxi.","X.Propithecus.coronatus.","Avahi_cleesei","X.Avahi.occidentalis.","X.Avahi.unicolor.","X.Avahi.betsileo.","Avahi_mooreorum","X.Avahi.laniger.","Avahi_peyrierasi","X.Avahi.ramanantsoavanai.","X.Avahi.meridionalis.","X.Lepilemur.scottorum.","Lepilemur_seali","X.Lepilemur.wrightae.","X.Lepilemur.fleuretae.","X.Lepilemur.mittermeieri.","X.Lepilemur.betsileo.","Lepilemur_leucopus","X.Lepilemur.mustelinus.","X.Lepilemur.septentrionalis.","X.Lepilemur.ankaranensis.","X.Lepilemur.milanoii.","X.Lepilemur.tymerlachsoni.","Lepilemur_dorsalis","Lepilemur_edwardsi","X.Lepilemur.ahmansonorum.","X.Lepilemur.otto.","X.Lepilemur.microdon.","Lepilemur_grewcockorum","X.Lepilemur.petteri.","X.Lepilemur.hollandorum.","X.Lepilemur.sahamalazensis.","X.Lepilemur.ruficaudatus.","Lepilemur_hubbardorum","X.Lepilemur.randrianasoloi.","Lepilemur_jamesorum","Lepilemur_aeeclis","X.Cheirogaleus.lavasoensis.","Cheirogaleus_sibreei","Cheirogaleus_major","Cheirogaleus_grovesi","Cheirogaleus_crossleyi","X.Cheirogaleus.minusculus.","X.Cheirogaleus.shethi.","X.Cheirogaleus.andysabini.","Cheirogaleus_medius","X.Allocebus.trichotis.","Mirza_coquereli","Mirza_zaza","X.Phaner.pallescens.","X.Phaner.electromontis.","X.Phaner.parienti.","X.Phaner.furcifer.","X.Microcebus.macarthurii.","X.Microcebus.ravelobensis.","X.Microcebus.mamiratra.","Microcebus_jollyae","Microcebus_griseorufus","X.Microcebus.murinus.","X.Microcebus.danfossi.","X.Microcebus.ganzhorni.","X.Microcebus.manitatra.","Microcebus_boraha","X.Microcebus.marohita.","Microcebus_gerpi","X.Microcebus.bongolavensis.","X.Microcebus.tavaratra.","X.Microcebus.arnholdi.","X.Microcebus.margotmarshae.","X.Microcebus.sambiranensis.","X.Microcebus.berthae.","X.Microcebus.mittermeieri.","Microcebus_rufus","X.Microcebus.myoxinus.","X.Microcebus.lehilahytsara.","X.Microcebus.tanosi.","X.Microcebus.jonahi.","X.Microcebus.simmonsi.")
 
 # Loop through TACT tree replicates calculating tip DR for each sp --------
 
@@ -39,260 +29,118 @@ for(i in 2:length(StrepsirrhineTrees)){
 allTreesDRdf<-as.data.frame(allTreesDR)
 
 max(colMeans(allTreesDRdf))
+max((allTreesDRdf))
 
 # Merge raw species stats into clade stats --------------------------------
 
-Lorisidae<-c("Arctocebus_aureus","Arctocebus_calabarensis","Perodicticus_potto","Perodicticus_ibeanus","Perodicticus_edwardsi","Loris_lydekkerianus","Loris_tardigradus","Nycticebus_menagensis","Nycticebus_javanicus","Nycticebus_pygmaeus","Nycticebus_bancanus","Nycticebus_bengaliensis","Nycticebus_kayan","Nycticebus_coucang","Nycticebus_hilleri","Nycticebus_borneanus")
-Galagidae<-c("Euoticus_pallidus","Euoticus_elegantulus","Galagoides_thomasi","Galagoides_kumbirensis","Galagoides_demidoff","Otolemur_garnettii","Otolemur_crassicaudatus","Otolemur_monteiri","Sciurocheirus_makandensis","Sciurocheirus_alleni","Sciurocheirus_gabonensis","Sciurocheirus_cameronensis","Galago_matschiei","Galago_moholi","Galago_gallarum","Galago_senegalensis","Paragalago_orinus","Paragalago_granti","Paragalago_rondoensis","Paragalago_zanzibaricus","Paragalago_nyasae","Paragalago_cocos")
-Daubentoniidae<-c("Daubentonia_madagascariensis")
-Lemuridae<-c("Varecia_rubra","Varecia_variegata","Lemur_catta","Prolemur_simus","Hapalemur_gilberti","Hapalemur_meridionalis","Hapalemur_griseus","Hapalemur_occidentalis","Hapalemur_alaotrensis","Hapalemur_aureus","Eulemur_rubriventer","Eulemur_mongoz","Eulemur_coronatus","Eulemur_macaco","Eulemur_flavifrons","Eulemur_sanfordi","Eulemur_albifrons","Eulemur_fulvus","Eulemur_cinereiceps","Eulemur_collaris","Eulemur_rufifrons","Eulemur_rufus")
-Lepilemuridae<-c("Lepilemur_seali","Lepilemur_hollandorum","Lepilemur_wrightae","Lepilemur_mustelinus","Lepilemur_sahamalazensis","Lepilemur_betsileo","Lepilemur_grewcockorum","Lepilemur_otto","Lepilemur_scottorum","Lepilemur_fleuretae","Lepilemur_petteri","Lepilemur_ruficaudatus","Lepilemur_hubbardorum","Lepilemur_aeeclis","Lepilemur_randrianasoloi","Lepilemur_mittermeieri","Lepilemur_septentrionalis","Lepilemur_microdon","Lepilemur_milanoii","Lepilemur_jamesorum","Lepilemur_ankaranensis","Lepilemur_edwardsi","Lepilemur_leucopus","Lepilemur_ahmansonorum","Lepilemur_tymerlachsoni","Lepilemur_dorsalis")
-Indriidae<-c("Indri_indri","Avahi_unicolor","Avahi_occidentalis","Avahi_cleesei","Avahi_laniger","Avahi_peyrierasi","Avahi_betsileo","Avahi_mooreorum","Avahi_ramanantsoavanai","Avahi_meridionalis","Propithecus_edwardsi","Propithecus_diadema","Propithecus_perrieri","Propithecus_verreauxi","Propithecus_coronatus","Propithecus_tattersalli","Propithecus_coquereli","Propithecus_candidus","Propithecus_deckenii")
-Cheirogaleidae<-c("Cheirogaleus_sibreei","Cheirogaleus_major","Cheirogaleus_minusculus","Cheirogaleus_crossleyi","Cheirogaleus_medius","Cheirogaleus_shethi","Cheirogaleus_andysabini","Cheirogaleus_lavasoensis","Cheirogaleus_grovesi","Mirza_zaza","Mirza_coquereli","Allocebus_trichotis","Phaner_electromontis","Phaner_pallescens","Phaner_parienti","Phaner_furcifer","Microcebus_macarthurii","Microcebus_jollyae","Microcebus_ravelobensis","Microcebus_manitatra","Microcebus_griseorufus","Microcebus_murinus","Microcebus_ganzhorni","Microcebus_bongolavensis","Microcebus_danfossi","Microcebus_marohita","Microcebus_gerpi","Microcebus_boraha","Microcebus_mittermeieri","Microcebus_lehilahytsara","Microcebus_mamiratra","Microcebus_myoxinus","Microcebus_simmonsi","Microcebus_rufus","Microcebus_tanosi","Microcebus_tavaratra","Microcebus_arnholdi","Microcebus_sambiranensis","Microcebus_berthae","Microcebus_jonahi","Microcebus_margotmarshae")
+LorisiformsDRs<-as.data.frame(unlist(allTreesDRdf[,Lorisiforms]))
+LorisiformsDRs<-cbind(LorisiformsDRs, rep("Lorisiforms",times=length(LorisiformsDRs)))
+names(LorisiformsDRs)<-c("DR","names")
+ggplot(LorisiformsDRs, aes(x=DR))+geom_density(fill="gray", adjust=4)+xlim(0,3)+ylim(0,7)
 
-LorisidaeDRs<-as.data.frame(unlist(allTreesDRdf[,Lorisidae]))
-LorisidaeDRs<-cbind(LorisidaeDRs, rep("Lorisidae",times=length(LorisidaeDRs)))
-names(LorisidaeDRs)<-c("DR","names")
-ggplot(LorisidaeDRs, aes(x=DR))+geom_density(fill="gray", adjust=4)
-
-GalagidaeDRs<-as.data.frame(unlist(allTreesDRdf[,Galagidae]))
-GalagidaeDRs<-cbind(GalagidaeDRs, rep("Galagidae",times=length(GalagidaeDRs)))
-names(GalagidaeDRs)<-c("DR","names")
-ggplot(GalagidaeDRs, aes(x=DR))+geom_density(fill="gray", adjust=4)
-
-LorisiformDRs<-rbind(LorisidaeDRs, GalagidaeDRs)
-ggplot(LorisiformDRs, aes(x=names))+geom_density(fill="gray", adjust=4)
-
-ggplot(LorisiformDRs, aes(x=DR, y=names, fill=names))+
-	geom_density_ridges(adjust=4)+
-	theme_ridges()+
-	theme(
-		legend.position="none",
-		panel.spacing=unit(0.1, "lines"),
-		strip.text.x=element_text(size=8)
-	)
-
-LemuridaeDRs<-as.data.frame(unlist(allTreesDRdf[,Lemuridae]))
-LemuridaeDRs<-cbind(LemuridaeDRs, rep("Lemuridae",times=length(LemuridaeDRs)))
-names(LemuridaeDRs)<-c("DR","names")
-ggplot(LemuridaeDRs, aes(x=DR))+geom_density(fill="gray", adjust=4)
-
-IndriidaeDRs<-as.data.frame(unlist(allTreesDRdf[,Indriidae]))
-IndriidaeDRs<-cbind(IndriidaeDRs, rep("Indriidae",times=length(IndriidaeDRs)))
-names(IndriidaeDRs)<-c("DR","names")
-ggplot(IndriidaeDRs, aes(x=DR))+geom_density(fill="gray", adjust=4)
-
-LepilemuridaeDRs<-as.data.frame(unlist(allTreesDRdf[,Lepilemuridae]))
-LepilemuridaeDRs<-cbind(LepilemuridaeDRs, rep("Lepilemuridae",times=length(LepilemuridaeDRs)))
-names(LepilemuridaeDRs)<-c("DR","names")
-ggplot(LepilemuridaeDRs, aes(x=DR))+geom_density(fill="gray", adjust=4)
-
-CheirogaleidaeDRs<-as.data.frame(unlist(allTreesDRdf[,Cheirogaleidae]))
-CheirogaleidaeDRs<-cbind(CheirogaleidaeDRs, rep("Cheirogaleidae",times=length(CheirogaleidaeDRs)))
-names(CheirogaleidaeDRs)<-c("DR","names")
-ggplot(CheirogaleidaeDRs, aes(x=DR))+geom_density(fill="gray", adjust=4)
-
-DaubentoniidaeDRs<-as.data.frame(unlist(allTreesDRdf[,Daubentoniidae]))
-DaubentoniidaeDRs<-cbind(DaubentoniidaeDRs, rep("Daubentoniidae",times=length(DaubentoniidaeDRs)))
-names(DaubentoniidaeDRs)<-c("DR","names")
-
-LemuriformDRs<-rbind(LemuridaeDRs, IndriidaeDRs, LepilemuridaeDRs, CheirogaleidaeDRs)
-ggplot(LemuriformDRs, aes(x=DR, y=names, fill=names))+
-	geom_density_ridges(adjust=4)+
-	theme_ridges()+
-	theme(
-		legend.position="none",
-		panel.spacing=unit(0.1, "lines"),
-		strip.text.x=element_text(size=8)
-	)
-
-AllStrepDRs<-rbind(GalagidaeDRs, LorisidaeDRs, LemuridaeDRs, IndriidaeDRs, LepilemuridaeDRs, CheirogaleidaeDRs, DaubentoniidaeDRs)
-ggplot(AllStrepDRs, aes(x=DR, y=names, fill=names))+
-	geom_density_ridges(bandwidth=5, scale=2)+
-	xlim(-20,100)+
-	theme_ridges()+
-	theme(
-		legend.position="none",
-		panel.spacing=unit(0.1, "lines"),
-		strip.text.x=element_text(size=8)
-	)
-
-
-NoAyeAyeDRs<-rbind(GalagidaeDRs, LorisidaeDRs, LemuridaeDRs, IndriidaeDRs, LepilemuridaeDRs, CheirogaleidaeDRs)
-ggplot(NoAyeAyeDRs, aes(x=DR, y=names, fill=names))+
-	geom_density_ridges(bandwidth=3, scale=2)+
-	xlim(-10,100)+
-	theme_ridges()+
-	theme(
-		legend.position="none",
-		panel.spacing=unit(0.1, "lines"),
-		strip.text.x=element_text(size=8)
-	)
-
+LemuriformsDRs<-as.data.frame(unlist(allTreesDRdf[,Lemuriforms]))
+LemuriformsDRs<-cbind(LemuriformsDRs, rep("Lemuriforms",times=length(LemuriformsDRs)))
+names(LemuriformsDRs)<-c("DR","names")
+ggplot(LemuriformsDRs, aes(x=DR))+geom_density(fill="gray", adjust=4)+xlim(0,3)+ylim(0,3)
 
 
 # Simulated Trees for Expected DR Distributions ---------------------------
 
-#Prune the 1000 trees (with tips stochastically added w/TACT) to only Lorisidae
-LorisidaeTrees<-drop.tip.multiPhylo(StrepsirrhineTrees, tip=c(Galagidae, Lemuridae, Daubentoniidae, Indriidae, Cheirogaleidae, Lepilemuridae))
-#Estimate Gamma for each Lorisidae subtree in the set of TACT trees
-LorisidaeGamma[1]<-yule(LorisidaeTrees[[1]])$lambda
-for(i in 2:1000){
-	LorisidaeGamma[i]<-yule(LorisidaeTrees[[i]])$lambda
+LorisiformTips<-c("'Arctocebus aureus'","'Arctocebus calabarensis'","'Perodicticus potto'","'Perodicticus ibeanus'","'Perodicticus edwardsi'","'Loris lydekkerianus'","'Loris tardigradus'","'Nycticebus bengaliensis'","'Nycticebus bancanus'","'Nycticebus borneanus'","'Nycticebus javanicus'","'Nycticebus menagensis'","'Nycticebus pygmaeus'","'Nycticebus coucang'","'Nycticebus hilleri'","'Nycticebus kayan'","'Euoticus pallidus'","'Euoticus elegantulus'","'Galagoides thomasi'","'Galagoides kumbirensis'","Galagoides_demidoff","'Otolemur monteiri'","'Otolemur crassicaudatus'","'Otolemur garnettii'","'Sciurocheirus gabonensis'","'Sciurocheirus cameronensis'","'Sciurocheirus makandensis'","'Sciurocheirus alleni'","Galago_moholi","'Galago senegalensis'","Galago_gallarum","'Galago matschiei'","'Paragalago nyasae'","'Paragalago orinus'","'Paragalago granti'","Paragalago_cocos","'Paragalago rondoensis'","'Paragalago zanzibaricus'")
+LemuriformTips<-c("'Daubentonia madagascariensis'","Varecia_rubra","'Varecia variegata'","'Lemur catta'","Prolemur_simus","'Hapalemur gilberti'","Hapalemur_griseus","'Hapalemur meridionalis'","Hapalemur_aureus","'Hapalemur alaotrensis'","'Hapalemur occidentalis'","'Eulemur mongoz'","'Eulemur rubriventer'","'Eulemur coronatus'","'Eulemur flavifrons'","Eulemur_macaco","'Eulemur albifrons'","'Eulemur sanfordi'","'Eulemur rufifrons'","Eulemur_fulvus","Eulemur_rufus","Eulemur_collaris","'Eulemur cinereiceps'","'Indri indri'","'Propithecus edwardsi'","'Propithecus diadema'","'Propithecus perrieri'","'Propithecus coquereli'","'Propithecus candidus'","'Propithecus tattersalli'","'Propithecus deckenii'","'Propithecus verreauxi'","'Propithecus coronatus'","Avahi_cleesei","'Avahi occidentalis'","'Avahi unicolor'","'Avahi betsileo'","Avahi_mooreorum","'Avahi laniger'","Avahi_peyrierasi","'Avahi ramanantsoavanai'","'Avahi meridionalis'","'Lepilemur scottorum'","Lepilemur_seali","'Lepilemur wrightae'","'Lepilemur fleuretae'","'Lepilemur mittermeieri'","'Lepilemur betsileo'","Lepilemur_leucopus","'Lepilemur mustelinus'","'Lepilemur septentrionalis'","'Lepilemur ankaranensis'","'Lepilemur milanoii'","'Lepilemur tymerlachsoni'","Lepilemur_dorsalis","Lepilemur_edwardsi","'Lepilemur ahmansonorum'","'Lepilemur otto'","'Lepilemur microdon'","Lepilemur_grewcockorum","'Lepilemur petteri'","'Lepilemur hollandorum'","'Lepilemur sahamalazensis'","'Lepilemur ruficaudatus'","Lepilemur_hubbardorum","'Lepilemur randrianasoloi'","Lepilemur_jamesorum","Lepilemur_aeeclis","'Cheirogaleus lavasoensis'","Cheirogaleus_sibreei","Cheirogaleus_major","Cheirogaleus_grovesi","Cheirogaleus_crossleyi","'Cheirogaleus minusculus'","'Cheirogaleus shethi'","'Cheirogaleus andysabini'","Cheirogaleus_medius","'Allocebus trichotis'","Mirza_coquereli","Mirza_zaza","'Phaner pallescens'","'Phaner electromontis'","'Phaner parienti'","'Phaner furcifer'","'Microcebus macarthurii'","'Microcebus ravelobensis'","'Microcebus mamiratra'","Microcebus_jollyae","Microcebus_griseorufus","'Microcebus murinus'","'Microcebus danfossi'","'Microcebus ganzhorni'","'Microcebus manitatra'","Microcebus_boraha","'Microcebus marohita'","Microcebus_gerpi","'Microcebus bongolavensis'","'Microcebus tavaratra'","'Microcebus arnholdi'","'Microcebus margotmarshae'","'Microcebus sambiranensis'","'Microcebus berthae'","'Microcebus mittermeieri'","Microcebus_rufus","'Microcebus myoxinus'","'Microcebus lehilahytsara'","'Microcebus tanosi'","'Microcebus jonahi'","'Microcebus simmonsi'")
+
+#create Lorisiform and Lemuriform subtrees
+LorisiformTrees<-keep.tip(StrepsirrhineTrees, tip=LorisiformTips)
+LemuriformsTrees<-keep.tip(StrepsirrhineTrees, tip=LemuriformTips)
+
+#Estimate Gamma for each Lorisiform subtree in the set of TACT trees
+LorisiformGamma<-NULL
+LorisiformGamma[1]<-yule(LorisiformTrees[[1]])$lambda
+for(i in 2:6000){
+  LorisiformGamma[i]<-yule(LorisiformTrees[[i]])$lambda
 }
-LorisidaeGamma<-unlist(LorisidaeGamma)
-#Simulate new trees using the same gamma and n(spp) from each Lorisidae subtree
-LorisidaeSimTrees<-NULL
-for(i in 1:1000){
-	LorisidaeSimTrees[[i]]<-pbtree(b=LorisidaeGamma[i], d=0, n=length(Lorisidae))
+LorisiformGamma<-unlist(LorisiformGamma)
+#Simulate new trees using the same gamma and n(spp) from each Lorisiform subtree
+LorisiformSimTrees<-NULL
+for(i in 1:6000){
+  LorisiformSimTrees[[i]]<-pbtree(b=LorisiformGamma[i], d=0, n=length(Lorisiforms))
 }
 #Estimate tip DR on each simulated tree
-LorisidaeSimTreesDR<-DRstat(LorisidaeSimTrees[[1]])
-for(i in 2:length(LorisidaeSimTrees)){
-	LorisidaeSimTreesDR<-Map(c, LorisidaeSimTreesDR, DRstat(LorisidaeSimTrees[[i]]))
+LorisiformSimTreesDR<-DRstat(LorisiformSimTrees[[1]])
+for(i in 2:length(LorisiformSimTrees)){
+  LorisiformSimTreesDR<-Map(c, LorisiformSimTreesDR, DRstat(LorisiformSimTrees[[i]]))
 }
-LorisidaeSimTreesDRdf<-as.data.frame(LorisidaeSimTreesDR)
-#Create a density plot of the tip DR values for the simulated Lorisidae Trees
-LorisidaeSimTreesDR<-as.data.frame(unlist(LorisidaeSimTreesDRdf))
-LorisidaeSimTreesDR<-cbind(LorisidaeSimTreesDR, rep("LorisidaeSims",times=length(LorisidaeSimTreesDR)))
-names(LorisidaeSimTreesDR)<-c("DR","names")
-ggplot(LorisidaeSimTreesDR, aes(x=DR))+geom_density(fill="gray", adjust=4)
+LorisiformSimTreesDRdf<-as.data.frame(LorisiformSimTreesDR)
+#Create a density plot of the tip DR values for the simulated Lorisiform Trees
+LorisiformSimTreesDR<-as.data.frame(unlist(LorisiformSimTreesDRdf))
+LorisiformSimTreesDR<-cbind(LorisiformSimTreesDR, rep("LorisiformSims",times=length(LorisiformSimTreesDR)))
+names(LorisiformSimTreesDR)<-c("DR","names")
+ggplot(LorisiformSimTreesDR, aes(x=DR))+geom_density(fill="gray", adjust=4)+xlim(0,3)+ylim(0,7)
 
 
-#Prune the 1000 trees (with tips stochastically added w/TACT) to only Galagidae
-GalagidaeTrees<-drop.tip.multiPhylo(StrepsirrhineTrees, tip=c(Lorisidae, Lemuridae, Daubentoniidae, Indriidae, Cheirogaleidae, Lepilemuridae))
-#Estimate Gamma for each Galagidae subtree in the set of TACT trees
-GalagidaeGamma<-yule(GalagidaeTrees[[1]])$lambda
-for(i in 2:1000){
-	GalagidaeGamma[i]<-yule(GalagidaeTrees[[i]])$lambda
+#Estimate Gamma for each Lemuriform subtree in the set of TACT trees
+LemuriformGamma<-NULL
+LemuriformGamma[1]<-yule(LemuriformsTrees[[1]])$lambda
+for(i in 2:6000){
+  LemuriformGamma[i]<-yule(LemuriformsTrees[[i]])$lambda
 }
-GalagidaeGamma<-unlist(GalagidaeGamma)
-#Simulate new trees using the same gamma and n(spp) from each Galagidae subtree
-GalagidaeSimTrees<-NULL
-for(i in 1:1000){
-	GalagidaeSimTrees[[i]]<-pbtree(b=GalagidaeGamma[i], d=0, n=length(Galagidae))
+LemuriformGamma<-unlist(LemuriformGamma)
+#Simulate new trees using the same gamma and n(spp) from each Lemuriform subtree
+LemuriformSimTrees<-NULL
+for(i in 1:6000){
+  LemuriformSimTrees[[i]]<-pbtree(b=LemuriformGamma[i], d=0, n=length(Lemuriforms))
 }
 #Estimate tip DR on each simulated tree
-GalagidaeSimTreesDR<-DRstat(GalagidaeSimTrees[[1]])
-for(i in 2:length(GalagidaeSimTrees)){
-	GalagidaeSimTreesDR<-Map(c, GalagidaeSimTreesDR, DRstat(GalagidaeSimTrees[[i]]))
+LemuriformSimTreesDR<-DRstat(LemuriformSimTrees[[1]])
+for(i in 2:length(LemuriformSimTrees)){
+  LemuriformSimTreesDR<-Map(c, LemuriformSimTreesDR, DRstat(LemuriformSimTrees[[i]]))
 }
-GalagidaeSimTreesDRdf<-as.data.frame(GalagidaeSimTreesDR)
-#Create a density plot of the tip DR values for the simulated Galagidae Trees
-GalagidaeSimTreesDR<-as.data.frame(unlist(GalagidaeSimTreesDRdf))
-GalagidaeSimTreesDR<-cbind(GalagidaeSimTreesDR, rep("GalagidaeSims",times=length(GalagidaeSimTreesDR)))
-names(GalagidaeSimTreesDR)<-c("DR","names")
-ggplot(GalagidaeSimTreesDR, aes(x=DR))+geom_density(fill="gray", adjust=4)
+LemuriformSimTreesDRdf<-as.data.frame(LemuriformSimTreesDR)
+#Create a density plot of the tip DR values for the simulated Lemuriform Trees
+LemuriformSimTreesDR<-as.data.frame(unlist(LemuriformSimTreesDRdf))
+LemuriformSimTreesDR<-cbind(LemuriformSimTreesDR, rep("LemuriformSims",times=length(LemuriformSimTreesDR)))
+names(LemuriformSimTreesDR)<-c("DR","names")
+ggplot(LemuriformSimTreesDR, aes(x=DR))+geom_density(fill="gray", adjust=4)+xlim(0,3)+ylim(0,3)
 
 
-#Prune the 1000 trees (with tips stochastically added w/TACT) to only Lemuridae
-LemuridaeTrees<-drop.tip.multiPhylo(StrepsirrhineTrees, tip=c(Lorisidae, Galagidae, Daubentoniidae, Indriidae, Cheirogaleidae, Lepilemuridae))
-#Estimate Gamma for each Lemuridae subtree in the set of TACT trees
-LemuridaeGamma<-yule(LemuridaeTrees[[1]])$lambda
-for(i in 2:1000){
-	LemuridaeGamma[i]<-yule(LemuridaeTrees[[i]])$lambda
-}
-LemuridaeGamma<-unlist(LemuridaeGamma)
-#Simulate new trees using the same gamma and n(spp) from each Lemuridae subtree
-LemuridaeSimTrees<-NULL
-for(i in 1:1000){
-	LemuridaeSimTrees[[i]]<-pbtree(b=LemuridaeGamma[i], d=0, n=length(Lemuridae))
-}
-#Estimate tip DR on each simulated tree
-LemuridaeSimTreesDR<-DRstat(LemuridaeSimTrees[[1]])
-for(i in 2:length(LemuridaeSimTrees)){
-	LemuridaeSimTreesDR<-Map(c, LemuridaeSimTreesDR, DRstat(LemuridaeSimTrees[[i]]))
-}
-LemuridaeSimTreesDRdf<-as.data.frame(LemuridaeSimTreesDR)
-#Create a density plot of the tip DR values for the simulated Lemuridae Trees
-LemuridaeSimTreesDR<-as.data.frame(unlist(LemuridaeSimTreesDRdf))
-LemuridaeSimTreesDR<-cbind(LemuridaeSimTreesDR, rep("LemuridaeSims",times=length(LemuridaeSimTreesDR)))
-names(LemuridaeSimTreesDR)<-c("DR","names")
-ggplot(LemuridaeSimTreesDR, aes(x=DR))+geom_density(fill="gray", adjust=4)
+# LineagesThroughTimePlots ------------------------------------------------
 
-#Prune the 1000 trees (with tips stochastically added w/TACT) to only Indriidae
-IndriidaeTrees<-drop.tip.multiPhylo(StrepsirrhineTrees, tip=c(Lorisidae, Galagidae, Daubentoniidae, Lemuridae, Cheirogaleidae, Lepilemuridae))
-#Estimate Gamma for each Indriidae subtree in the set of TACT trees
-IndriidaeGamma<-yule(IndriidaeTrees[[1]])$lambda
-for(i in 2:1000){
-	IndriidaeGamma[i]<-yule(IndriidaeTrees[[i]])$lambda
+for(i in 1:length(LorisiformTrees)){
+  LorisiformTrees[[i]]<-force.ultrametric(LorisiformTrees[[i]])
 }
-IndriidaeGamma<-unlist(IndriidaeGamma)
-#Simulate new trees using the same gamma and n(spp) from each Indriidae subtree
-IndriidaeSimTrees<-NULL
-for(i in 1:1000){
-	IndriidaeSimTrees[[i]]<-pbtree(b=IndriidaeGamma[i], d=0, n=length(Indriidae))
-}
-#Estimate tip DR on each simulated tree
-IndriidaeSimTreesDR<-DRstat(IndriidaeSimTrees[[1]])
-for(i in 2:length(IndriidaeSimTrees)){
-	IndriidaeSimTreesDR<-Map(c, IndriidaeSimTreesDR, DRstat(IndriidaeSimTrees[[i]]))
-}
-IndriidaeSimTreesDRdf<-as.data.frame(IndriidaeSimTreesDR)
-#Create a density plot of the tip DR values for the simulated Indriidae Trees
-IndriidaeSimTreesDR<-as.data.frame(unlist(IndriidaeSimTreesDRdf))
-IndriidaeSimTreesDR<-cbind(IndriidaeSimTreesDR, rep("IndriidaeSims",times=length(IndriidaeSimTreesDR)))
-names(IndriidaeSimTreesDR)<-c("DR","names")
-ggplot(IndriidaeSimTreesDR, aes(x=DR))+geom_density(fill="gray", adjust=4)
 
-#Prune the 1000 trees (with tips stochastically added w/TACT) to only Lepilemuridae
-LepilemuridaeTrees<-drop.tip.multiPhylo(StrepsirrhineTrees, tip=c(Lorisidae, Galagidae, Daubentoniidae, Lemuridae, Cheirogaleidae, Indriidae))
-#Estimate Gamma for each Lepilemuridae subtree in the set of TACT trees
-LepilemuridaeGamma<-yule(LepilemuridaeTrees[[1]])$lambda
-for(i in 2:1000){
-	LepilemuridaeGamma[i]<-yule(LepilemuridaeTrees[[i]])$lambda
+for(i in 1:length(LemuriformsTrees)){
+  LemuriformsTrees[[i]]<-force.ultrametric(LemuriformsTrees[[i]])
 }
-LepilemuridaeGamma<-unlist(LepilemuridaeGamma)
-#Simulate new trees using the same gamma and n(spp) from each Lepilemuridae subtree
-LepilemuridaeSimTrees<-NULL
-for(i in 1:1000){
-	LepilemuridaeSimTrees[[i]]<-pbtree(b=LepilemuridaeGamma[i], d=0, n=length(Lepilemuridae))
-}
-#Estimate tip DR on each simulated tree
-LepilemuridaeSimTreesDR<-DRstat(LepilemuridaeSimTrees[[1]])
-for(i in 2:length(LepilemuridaeSimTrees)){
-	LepilemuridaeSimTreesDR<-Map(c, LepilemuridaeSimTreesDR, DRstat(LepilemuridaeSimTrees[[i]]))
-}
-LepilemuridaeSimTreesDRdf<-as.data.frame(LepilemuridaeSimTreesDR)
-#Create a density plot of the tip DR values for the simulated Lepilemuridae Trees
-LepilemuridaeSimTreesDR<-as.data.frame(unlist(LepilemuridaeSimTreesDRdf))
-LepilemuridaeSimTreesDR<-cbind(LepilemuridaeSimTreesDR, rep("LepilemuridaeSims",times=length(LepilemuridaeSimTreesDR)))
-names(LepilemuridaeSimTreesDR)<-c("DR","names")
-ggplot(LepilemuridaeSimTreesDR, aes(x=DR))+geom_density(fill="gray", adjust=4)
 
-#Prune the 1000 trees (with tips stochastically added w/TACT) to only Cheirogaleidae
-CheirogaleidaeTrees<-drop.tip.multiPhylo(StrepsirrhineTrees, tip=c(Lorisidae, Galagidae, Daubentoniidae, Lemuridae, Cheirogaleidae, Lepilemuridae))
-#Estimate Gamma for each Cheirogaleidae subtree in the set of TACT trees
-CheirogaleidaeGamma<-yule(CheirogaleidaeTrees[[1]])$lambda
-for(i in 2:1000){
-	CheirogaleidaeGamma[i]<-yule(CheirogaleidaeTrees[[i]])$lambda
+#lineages through time
+mccr<-mccr(ltt(LorisiformTrees[[i]], log.lineages=T), rho=.66, nsim=500)
+LorisiformGammas<-mccr$gamma
+LorisiformSimGammas<-mccr$null.gamma
+for(i in 2:6000){
+  mccr<-mccr(ltt(LorisiformTrees[[i]], log.lineages=T), rho=.66, nsim=500)
+  LorisiformGammas[i]<-mccr$gamma
+  LorisiformSimGammas<-c(LorisiformSimGammas,mccr$null.gamma)
 }
-CheirogaleidaeGamma<-unlist(CheirogaleidaeGamma)
-#Simulate new trees using the same gamma and n(spp) from each Cheirogaleidae subtree
-CheirogaleidaeSimTrees<-NULL
-for(i in 1:1000){
-	CheirogaleidaeSimTrees[[i]]<-pbtree(b=CheirogaleidaeGamma[i], d=0, n=length(Cheirogaleidae))
-}
-#Estimate tip DR on each simulated tree
-CheirogaleidaeSimTreesDR<-DRstat(CheirogaleidaeSimTrees[[1]])
-for(i in 2:length(CheirogaleidaeSimTrees)){
-	CheirogaleidaeSimTreesDR<-Map(c, CheirogaleidaeSimTreesDR, DRstat(CheirogaleidaeSimTrees[[i]]))
-}
-CheirogaleidaeSimTreesDRdf<-as.data.frame(CheirogaleidaeSimTreesDR)
-#Create a density plot of the tip DR values for the simulated Cheirogaleidae Trees
-CheirogaleidaeSimTreesDR<-as.data.frame(unlist(CheirogaleidaeSimTreesDRdf))
-CheirogaleidaeSimTreesDR<-cbind(CheirogaleidaeSimTreesDR, rep("CheirogaleidaeSims",times=length(CheirogaleidaeSimTreesDR)))
-names(CheirogaleidaeSimTreesDR)<-c("DR","names")
-ggplot(CheirogaleidaeSimTreesDR, aes(x=DR))+geom_density(fill="gray", adjust=4)
+hist(LorisiformSimGammas, breaks=20, xlim=c(-4,4))
+hist(LorisiformGammas, breaks=20, xlim=c(-4,4))
+hist(LorisiformSimGammas, ylim=c(0,1000), xlim=c(-5,8))
+hist(LorisiformGammas, add=T, col="blue")
 
-EmpSimDRs<-rbind(GalagidaeDRs, LorisidaeDRs, LemuridaeDRs, IndriidaeDRs, LepilemuridaeDRs, CheirogaleidaeDRs, GalagidaeSimTreesDR, LorisidaeSimTreesDR, LemuridaeSimTreesDR, IndriidaeSimTreesDR, LepilemuridaeSimTreesDR, CheirogaleidaeSimTreesDR)
-ggplot(EmpSimDRs, aes(x=DR, y=names, fill=names))+
-	geom_density_ridges(bandwidth=2, scale=2)+
-	xlim(-10,100)+
-	theme_ridges()+
-	theme(
-		legend.position="none",
-		panel.spacing=unit(0.1, "lines"),
-		strip.text.x=element_text(size=8)
-	)
+mccr<-mccr(ltt(LemuriformsTrees[[i]], log.lineages=T), rho=.66, nsim=500)
+LemurGammas<-mccr$gamma
+LemurSimGammas<-mccr$null.gamma
+for(i in 2:6000){
+  mccr<-mccr(ltt(LemuriformsTrees[[i]], log.lineages=T), rho=.66, nsim=500)
+  LemurGammas[i]<-mccr$gamma
+  LemurSimGammas<-c(LemurSimGammas,mccr$null.gamma)
+}
+hist(LemurSimGammas)
+hist(LemurGammas)
+hist(LemurSimGammas, ylim=c(0,500), xlim=c(-5,8))
+hist(LemurGammas, add=T, col="blue")
+
+# print DR medians per species
+DRsPerSpecies<-as.data.frame(sapply(allTreesDRdf, median))
+write.csv(DRsPerSpecies, file = "DRsPerSpecies_6000TactTrees.txt")
 
